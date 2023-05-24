@@ -1,0 +1,4 @@
+{
+  "pipeline": "pipeline.py:pipeline",
+  "population-pipeline": "population_pipeline.py:population_pipeline"
+}
