@@ -1,19 +1,9 @@
 deployments:
-  - name: population-statewise-hourly
-    description: >
-      This pipeline pulls population data from the https://datausa.io/api/data
-      API. The drilldown is state-wise and the pipeline runs hourly.
-    schedule:
-      interval: 3600
-    entrypoint: population_pipeline.py:population_pipeline
-    work_pool:
-      name: prod-pool
-
   - name: bnt-weekly
     description: BNT Hourly data pulled weekly
     schedule:
       # Every Monday at noon
       cron: "0 12 * * 1"
-    entrypoint: pipeline.py:pipeline
+    entrypoint: mtaprefect/flows/bnt_hourly_traffic.py:pipeline
     work_pool:
       name: prod-pool

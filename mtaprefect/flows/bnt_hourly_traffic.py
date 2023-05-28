@@ -6,15 +6,14 @@ from typing import Dict, List, Optional
 import prefect
 import pyspark.sql.functions as F
 import requests
-from prefect import flow, get_run_logger, task
-from prefect.filesystems import Azure as AzureBucket
-from pyspark.sql import SparkSession
-
 from mtaprefect.blocks import (
     AzureContainer,
     DatabricksConnectCluster,
     IcebergAzureHadoop,
 )
+from prefect import flow, get_run_logger, task
+from prefect.filesystems import Azure as AzureBucket
+from pyspark.sql import SparkSession
 
 
 def get_spark(configs: Dict[str, str]) -> SparkSession:
@@ -128,13 +127,16 @@ def get_bnt_date_params(
     stop_date: Optional[datetime.date],
 ):
     if start_date is None or stop_date is None:
-        base_date = prefect.context.get("scheduled_start_time")
+        base_date = prefect.runtime.flow_run.scheduled_start_time
         stop_date = base_date - datetime.timedelta(days=1)
         start_date = base_date - datetime.timedelta(days=8)
     return start_date, stop_date
 
 
-@flow
+@flow(
+    name="bnt-hourly-traffic",
+    description="Pulls data from Bridge & Tunnel Hourly Traffic dataset and appends to iceberg table in Azure using spark on Databricks",
+)
 def pipeline(
     start_date: Optional[datetime.date] = None,
     stop_date: Optional[datetime.date] = None,
@@ -148,7 +150,7 @@ def pipeline(
 
     spark_configs = {**iceberg.spark_configs(), **databricks_cluster.spark_configs()}
 
-    start_date, stop_date = get_bnt_date_params.submit(start_date, stop_date)
+    start_date, stop_date = get_bnt_date_params(start_date, stop_date)
     data = get_bnt_data.submit(
         start_date,
         stop_date,

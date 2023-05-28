@@ -2,10 +2,7 @@ name: prefect-azure-demo
 prefect-version: 2.10.9
 
 pull:
-- prefect.projects.steps.set_working_directory:
-    directory: /Users/mike/prefect-azure-demo
-# pull:
-# - prefect.projects.steps.git_clone_project:
-#     repository: git@github.com:mikekutzma/prefect-azure-demo.git
-#     branch: master
-#     access_token: null
+- prefect.projects.steps.git_clone_project:
+    repository: git@github.com:mikekutzma/prefect-azure-demo.git
+    branch: master
+    access_token: null
